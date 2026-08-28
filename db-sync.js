@@ -1,6 +1,17 @@
 (() => {
   let dbReady = false;
   const completingMachines = new Set();
+  let settingsState = {
+    outlet_name: 'Clean Wash Laundry',
+    branch_name: 'Outlet Merdeka',
+    address: '',
+    phone: '',
+    whatsapp: '',
+    cashier_name: 'Admin 01',
+    receipt_footer: 'Terima kasih telah menggunakan layanan kami.',
+    currency: 'IDR',
+    token_label: 'Koin / Token'
+  };
 
   async function api(url, options = {}) {
     const response = await fetch(url, {
@@ -56,8 +67,6 @@
     if (!dbReady) return localSetMachineStatus(id, status);
     const machine = machines.find(m => m.id === id); if (!machine) return;
     try {
-      // Jika admin menekan "Tersedia Lagi" setelah timer selesai lokal,
-      // selesaikan transaksi di database lebih dulu agar riwayat konsisten.
       if (status === 'available' && machine.status === 'completed') {
         await api('/api/machines', { method: 'PATCH', body: JSON.stringify({ id, status: 'completed', note: machine.note || null }) });
       }
@@ -160,8 +169,145 @@
     } catch (err) { alert(`Gagal menyimpan transaksi: ${err.message}`); }
   };
 
-  // Menjaga status selesai tetap persisten walaupun halaman dibiarkan terbuka.
-  // Ini juga menangkap kondisi ketika app.js sudah mengubah status menjadi completed secara lokal.
+  function injectSettingsUI() {
+    const view = document.getElementById('view-settings');
+    if (!view) return;
+    view.innerHTML = `
+      <div class="page-head">
+        <div>
+          <span class="eyebrow">Pengaturan</span>
+          <h1>Pengaturan Outlet</h1>
+          <p>Kelola identitas outlet, kontak, kasir, dan preferensi dasar aplikasi.</p>
+        </div>
+        <button id="saveSettingsBtn" class="hero-action">Simpan Perubahan</button>
+      </div>
+      <div class="settings-grid">
+        <section class="settings-card">
+          <div class="settings-card-head"><div><h3>Profil Outlet</h3><p>Informasi yang tampil di aplikasi dan nantinya dapat digunakan pada struk.</p></div></div>
+          <div class="settings-form-grid">
+            <label>Nama Outlet<input id="settingOutletName" type="text" placeholder="Clean Wash Laundry"></label>
+            <label>Nama Cabang<input id="settingBranchName" type="text" placeholder="Outlet Merdeka"></label>
+            <label class="full">Alamat<textarea id="settingAddress" rows="3" placeholder="Alamat outlet"></textarea></label>
+            <label>No. Telepon<input id="settingPhone" type="text" placeholder="08xxxxxxxxxx"></label>
+            <label>WhatsApp<input id="settingWhatsapp" type="text" placeholder="62xxxxxxxxxx"></label>
+          </div>
+        </section>
+        <section class="settings-card">
+          <div class="settings-card-head"><div><h3>Operasional</h3><p>Identitas kasir dan penamaan token untuk kebutuhan outlet.</p></div></div>
+          <div class="settings-form-grid">
+            <label>Nama Kasir / Admin<input id="settingCashierName" type="text" placeholder="Admin 01"></label>
+            <label>Nama Koin / Token<input id="settingTokenLabel" type="text" placeholder="Koin / Token"></label>
+            <label class="full">Footer Struk<textarea id="settingReceiptFooter" rows="3" placeholder="Terima kasih..."></textarea></label>
+          </div>
+        </section>
+        <section class="settings-card settings-preview-card">
+          <div class="settings-card-head"><div><h3>Preview Identitas</h3><p>Perubahan nama outlet dan cabang akan langsung diterapkan setelah disimpan.</p></div></div>
+          <div class="settings-preview">
+            <div class="brand-mark">🧺</div>
+            <div><strong id="settingsPreviewOutlet">Clean Wash Laundry</strong><span id="settingsPreviewBranch">Outlet Merdeka</span></div>
+          </div>
+          <div id="settingsSaveState" class="settings-save-state">Data tersimpan permanen di Neon.</div>
+        </section>
+      </div>`;
+
+    if (!document.getElementById('settingsInjectedStyle')) {
+      const style = document.createElement('style');
+      style.id = 'settingsInjectedStyle';
+      style.textContent = `
+        .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}.settings-card{background:#fff;border:1px solid #e6ebf2;border-radius:18px;padding:22px;box-shadow:0 6px 20px rgba(24,52,93,.05)}.settings-card-head h3{margin:0 0 5px;font-size:18px}.settings-card-head p{margin:0 0 20px;color:#71809b;font-size:13px}.settings-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.settings-form-grid label{display:flex;flex-direction:column;gap:7px;font-size:13px;font-weight:700;color:#26354d}.settings-form-grid .full{grid-column:1/-1}.settings-form-grid input,.settings-form-grid textarea{width:100%;box-sizing:border-box;border:1px solid #dce3ee;border-radius:11px;padding:12px 13px;font:inherit;color:#1e2d45;background:#fbfcfe;outline:none}.settings-form-grid input:focus,.settings-form-grid textarea:focus{border-color:#315e9d;background:#fff}.settings-preview-card{grid-column:1/-1}.settings-preview{display:flex;align-items:center;gap:14px;padding:18px;border-radius:14px;background:#f7f9fc;border:1px solid #e8edf4}.settings-preview strong,.settings-preview span{display:block}.settings-preview span{font-size:13px;color:#71809b;margin-top:4px}.settings-save-state{margin-top:14px;font-size:12px;color:#60708c}.settings-save-state.saving{color:#9b6c15}.settings-save-state.success{color:#16845b}.settings-save-state.error{color:#c33f4c}@media(max-width:850px){.settings-grid,.settings-form-grid{grid-template-columns:1fr}.settings-form-grid .full,.settings-preview-card{grid-column:auto}}`;
+      document.head.appendChild(style);
+    }
+
+    document.getElementById('saveSettingsBtn').onclick = saveSettings;
+    ['settingOutletName','settingBranchName'].forEach(id => document.getElementById(id)?.addEventListener('input', updateSettingsPreview));
+    fillSettingsForm();
+  }
+
+  function fillSettingsForm() {
+    const map = {
+      settingOutletName: settingsState.outlet_name,
+      settingBranchName: settingsState.branch_name,
+      settingAddress: settingsState.address,
+      settingPhone: settingsState.phone,
+      settingWhatsapp: settingsState.whatsapp,
+      settingCashierName: settingsState.cashier_name,
+      settingTokenLabel: settingsState.token_label,
+      settingReceiptFooter: settingsState.receipt_footer
+    };
+    Object.entries(map).forEach(([id,val]) => { const el=document.getElementById(id); if(el) el.value=val || ''; });
+    updateSettingsPreview();
+  }
+
+  function updateSettingsPreview() {
+    const outlet = document.getElementById('settingOutletName')?.value || settingsState.outlet_name;
+    const branch = document.getElementById('settingBranchName')?.value || settingsState.branch_name;
+    const a=document.getElementById('settingsPreviewOutlet'); if(a) a.textContent=outlet;
+    const b=document.getElementById('settingsPreviewBranch'); if(b) b.textContent=branch;
+  }
+
+  function applySettings() {
+    const topOutlet = document.querySelector('.topbar .outlet strong');
+    const topBranch = document.querySelector('.topbar .outlet div span');
+    const brandName = document.querySelector('.sidebar .brand strong');
+    const cashier = document.querySelector('.support-card span');
+    if (topOutlet) topOutlet.textContent = settingsState.outlet_name;
+    if (topBranch) topBranch.textContent = settingsState.branch_name;
+    if (brandName) brandName.textContent = settingsState.outlet_name.replace(/\s+(Laundry|Coin Laundry)$/i,'') || settingsState.outlet_name;
+    if (cashier) cashier.textContent = `Kasir: ${settingsState.cashier_name}`;
+    document.title = `${settingsState.outlet_name} Admin`;
+    fillSettingsForm();
+  }
+
+  async function loadSettings() {
+    try {
+      settingsState = { ...settingsState, ...(await api('/api/settings')) };
+      applySettings();
+    } catch (err) {
+      console.warn('Pengaturan outlet belum dapat dimuat:', err.message);
+    }
+  }
+
+  async function saveSettings() {
+    const state = document.getElementById('settingsSaveState');
+    const btn = document.getElementById('saveSettingsBtn');
+    const payload = {
+      outlet_name: document.getElementById('settingOutletName').value.trim(),
+      branch_name: document.getElementById('settingBranchName').value.trim(),
+      address: document.getElementById('settingAddress').value.trim(),
+      phone: document.getElementById('settingPhone').value.trim(),
+      whatsapp: document.getElementById('settingWhatsapp').value.trim(),
+      cashier_name: document.getElementById('settingCashierName').value.trim(),
+      token_label: document.getElementById('settingTokenLabel').value.trim(),
+      receipt_footer: document.getElementById('settingReceiptFooter').value.trim()
+    };
+    if (!payload.outlet_name || !payload.branch_name) return alert('Nama outlet dan nama cabang wajib diisi.');
+    try {
+      if(btn) btn.disabled=true;
+      if(state){ state.className='settings-save-state saving'; state.textContent='Menyimpan ke Neon...'; }
+      settingsState = { ...settingsState, ...(await api('/api/settings', { method:'PUT', body:JSON.stringify(payload) })) };
+      applySettings();
+      if(state){ state.className='settings-save-state success'; state.textContent='✓ Pengaturan berhasil disimpan permanen.'; }
+    } catch(err) {
+      if(state){ state.className='settings-save-state error'; state.textContent=`Gagal menyimpan: ${err.message}`; }
+      alert(`Gagal menyimpan pengaturan: ${err.message}`);
+    } finally {
+      if(btn) btn.disabled=false;
+    }
+  }
+
+  injectSettingsUI();
+  const localShowView = showView;
+  showView = function(view, updateHash=true) {
+    if (view !== 'settings') return localShowView(view, updateHash);
+    document.querySelectorAll('.app-view').forEach(v=>{ v.classList.remove('active-view'); v.classList.add('hidden-view'); });
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    const target=document.getElementById('view-settings');
+    if(target){ target.classList.remove('hidden-view'); target.classList.add('active-view'); fillSettingsForm(); }
+    document.querySelector('.nav-item[data-view="settings"]')?.classList.add('active');
+    if(updateHash && location.hash !== '#settings') history.pushState(null,'','#settings');
+    window.scrollTo({top:0,behavior:'auto'});
+  };
+
   setInterval(() => {
     if (!dbReady) return;
     const now = Date.now();
@@ -174,4 +320,5 @@
   }, 500);
 
   reloadDb().catch(err => console.warn('Neon belum terhubung:', err.message));
+  loadSettings();
 })();
