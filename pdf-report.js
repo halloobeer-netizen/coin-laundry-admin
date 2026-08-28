@@ -170,6 +170,13 @@
     refreshFilteredReport();
   }
 
-  function install(){installPdfButton();installReportFilter();}
+  function keepSingleTransactionButton() {
+    ['newTransactionHero','newTransactionOperations','newTransactionTransactions','mobileNewTx'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el) el.style.display='none';
+    });
+  }
+
+  function install(){keepSingleTransactionButton();installPdfButton();installReportFilter();}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);else install();
 })();
