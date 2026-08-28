@@ -5,13 +5,28 @@
     }).format(Number(value || 0));
   }
 
-  function getOutletIdentity() {
-    const outlet = document.querySelector('.outlet strong')?.textContent?.trim() || 'Clean Wash Laundry';
-    const branch = document.querySelector('.outlet span')?.textContent?.trim() || 'Outlet';
-    return { outlet, branch };
+  async function getOutletIdentity() {
+    try {
+      const response = await fetch('/api/settings', { cache: 'no-store' });
+      if (response.ok) {
+        const data = await response.json();
+        return {
+          outlet: data.outlet_name || 'Clean Wash Laundry',
+          branch: data.branch_name || 'Outlet',
+          address: data.address || '',
+          phone: data.phone || '',
+          whatsapp: data.whatsapp || '',
+          cashier: data.cashier_name || 'Admin 01'
+        };
+      }
+    } catch (_) {}
+
+    const outlet = document.querySelector('.outlet div strong')?.textContent?.trim() || 'Clean Wash Laundry';
+    const branch = document.querySelector('.outlet div span')?.textContent?.trim() || 'Outlet';
+    return { outlet, branch, address: '', phone: '', whatsapp: '', cashier: 'Admin 01' };
   }
 
-  function exportReportPDF() {
+  async function exportReportPDF() {
     if (!window.jspdf?.jsPDF) {
       alert('Modul PDF belum siap. Silakan refresh halaman lalu coba lagi.');
       return;
@@ -23,7 +38,8 @@
 
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-    const { outlet, branch } = getOutletIdentity();
+    const identity = await getOutletIdentity();
+    const { outlet, branch, address, phone, whatsapp, cashier } = identity;
     const now = new Date();
 
     const total = transactions.reduce((sum, t) => sum + Number(t.total || 0), 0);
@@ -33,18 +49,37 @@
 
     doc.setFontSize(18);
     doc.text('Laporan Operasional Coin Laundry', 14, 16);
-    doc.setFontSize(11);
-    doc.text(outlet, 14, 23);
-    doc.setFontSize(9);
-    doc.text(branch, 14, 29);
-    doc.text(`Dicetak: ${now.toLocaleString('id-ID')}`, 14, 35);
+
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'bold');
+    doc.text(outlet, 14, 24);
+    doc.setFont(undefined, 'normal');
 
     doc.setFontSize(10);
-    doc.text(`Total transaksi: ${transactions.length}`, 14, 45);
-    doc.text(`Total omzet: ${rupiahPdf(total)}`, 70, 45);
-    doc.text(`Cash: ${rupiahPdf(cash)}`, 145, 45);
-    doc.text(`QRIS: ${rupiahPdf(qris)}`, 210, 45);
-    doc.text(`Koin/Token: ${coins}`, 14, 51);
+    doc.text(branch, 14, 30);
+
+    let identityY = 36;
+    if (address) {
+      const addressLines = doc.splitTextToSize(`Alamat: ${address}`, 150);
+      doc.text(addressLines, 14, identityY);
+      identityY += addressLines.length * 5;
+    }
+    if (phone || whatsapp) {
+      const contacts = [phone ? `Telp: ${phone}` : '', whatsapp ? `WhatsApp: ${whatsapp}` : ''].filter(Boolean).join('   |   ');
+      doc.text(contacts, 14, identityY);
+      identityY += 5;
+    }
+    doc.text(`Kasir/Admin: ${cashier}`, 14, identityY);
+    identityY += 5;
+    doc.text(`Dicetak: ${now.toLocaleString('id-ID')}`, 14, identityY);
+
+    const summaryY = Math.max(54, identityY + 9);
+    doc.setFontSize(10);
+    doc.text(`Total transaksi: ${transactions.length}`, 14, summaryY);
+    doc.text(`Total omzet: ${rupiahPdf(total)}`, 70, summaryY);
+    doc.text(`Cash: ${rupiahPdf(cash)}`, 145, summaryY);
+    doc.text(`QRIS: ${rupiahPdf(qris)}`, 210, summaryY);
+    doc.text(`Koin/Token: ${coins}`, 14, summaryY + 6);
 
     const rows = transactions.map((t, i) => [
       i + 1,
@@ -59,7 +94,7 @@
     ]);
 
     doc.autoTable({
-      startY: 58,
+      startY: summaryY + 13,
       head: [['No', 'Waktu', 'Mesin', 'Berat', 'Layanan', 'Pembayaran', 'Koin', 'Total', 'Status']],
       body: rows.length ? rows : [['-', '-', '-', '-', 'Belum ada transaksi', '-', '-', '-', '-']],
       styles: { fontSize: 8, cellPadding: 2.4 },
