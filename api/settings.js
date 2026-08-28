@@ -1,4 +1,5 @@
 const { getSql, sendError } = require('./_db');
+const { requireAuth } = require('./_auth');
 
 const DEFAULTS = {
   outlet_name: 'Clean Wash Laundry',
@@ -13,6 +14,7 @@ const DEFAULTS = {
 };
 
 module.exports = async function handler(req, res) {
+  if (!requireAuth(req, res)) return;
   try {
     const sql = getSql();
 
