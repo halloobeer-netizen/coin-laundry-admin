@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Clean Wash Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">🧺</div>
+        <div>
+          <strong>Clean Wash</strong>
+          <span>Admin Management</span>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <button class="nav-item active" data-view="dashboard">⌂ <span>Dashboard</span></button>
+        <button class="nav-item" data-view="operations">◈ <span>Operasional</span></button>
+        <button class="nav-item" data-view="transactions">▤ <span>Riwayat Transaksi</span></button>
+        <button class="nav-item" data-view="machines">◉ <span>Mesin</span></button>
+        <button class="nav-item" data-view="reports">▥ <span>Laporan</span></button>
+        <button class="nav-item" data-view="services">◇ <span>Harga & Layanan</span></button>
+        <button class="nav-item" data-view="settings">⚙ <span>Pengaturan</span></button>
+      </nav>
+
+      <div class="support-card">
+        <strong>Shift Aktif</strong>
+        <span>Kasir: Admin 01</span>
+        <b id="shiftClock">--:--</b>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="outlet">
+          <span class="pin">⌖</span>
+          <div>
+            <strong>Clean Wash Laundry</strong>
+            <span>Outlet Merdeka</span>
+          </div>
+        </div>
+
+        <div class="top-actions">
+          <button id="newTransactionTop" class="primary-small">+ Transaksi Baru</button>
+          <div class="time-box">
+            <strong id="clock">--:--</strong>
+            <span id="dateText">--</span>
+          </div>
+        </div>
+      </header>
+
+      
+      <section id="view-dashboard" class="app-view">
+        <div class="page-head dashboard-head">
+          <div>
+            <span class="eyebrow">Dashboard Admin</span>
+            <h1>Ringkasan Hari Ini</h1>
+            <p>Dashboard hanya menampilkan ringkasan. Operasional mesin dan arsip transaksi berada di halaman terpisah.</p>
+          </div>
+          <button id="newTransactionHero" class="hero-action">+ Transaksi Baru</button>
+        </div>
+
+        <section class="stats">
+          <article><span>Omzet Hari Ini</span><strong id="todayRevenue">Rp0</strong><small id="todayTxCount">0 transaksi</small></article>
+          <article><span>Cash</span><strong id="cashRevenue">Rp0</strong><small>Pembayaran tunai</small></article>
+          <article><span>QRIS</span><strong id="qrisRevenue">Rp0</strong><small>Pembayaran digital</small></article>
+          <article><span>Koin Diberikan</span><strong id="coinTotal">0</strong><small>Token hari ini</small></article>
+        </section>
+
+        <section class="dashboard-grid">
+          <article class="dashboard-card">
+            <div class="card-title-row">
+              <div>
+                <span class="eyebrow">Mesin</span>
+                <h3>Status Operasional</h3>
+              </div>
+              <button class="text-link" data-go="operations">Buka Operasional →</button>
+            </div>
+            <div class="mini-machine-stats">
+              <div><strong id="dashAvailable">0</strong><span>Tersedia</span></div>
+              <div><strong id="dashBusy">0</strong><span>Digunakan</span></div>
+              <div><strong id="dashMaintenance">0</strong><span>Maintenance</span></div>
+            </div>
+          </article>
+
+          <article class="dashboard-card">
+            <div class="card-title-row">
+              <div>
+                <span class="eyebrow">Transaksi</span>
+                <h3>Aktivitas Terakhir</h3>
+              </div>
+              <button class="text-link" data-go="transactions">Buka Riwayat →</button>
+            </div>
+            <div id="dashboardRecentList" class="dashboard-recent-list"></div>
+          </article>
+        </section>
+      </section>
+
+      <section id="view-operations" class="app-view hidden-view">
+        <div class="page-head">
+          <div>
+            <span class="eyebrow">Operasional</span>
+            <h1>Operasional Outlet</h1>
+            <p>Halaman kerja utama kasir untuk memantau mesin dan membuat transaksi baru.</p>
+          </div>
+          <button id="newTransactionOperations" class="hero-action">+ Transaksi Baru</button>
+        </div>
+
+        <div class="operation-summary">
+          <article><span>Mesin Tersedia</span><strong id="opAvailable">0</strong><small>Siap digunakan</small></article>
+          <article><span>Sedang Digunakan</span><strong id="opBusy">0</strong><small>Mesin aktif</small></article>
+          <article><span>Maintenance</span><strong id="opMaintenance">0</strong><small>Perlu pengecekan</small></article>
+          <article><span>Transaksi Hari Ini</span><strong id="opTxCount">0</strong><small>Sudah tercatat</small></article>
+        </div>
+
+        <section class="machine-section operation-machine-section">
+          <div class="section-head">
+            <div>
+              <h2>Status Mesin Saat Ini</h2>
+              <p>Pilih mesin tersedia untuk membuat transaksi baru.</p>
+            </div>
+            <div class="legend">
+              <span><i class="dot available"></i>Tersedia</span>
+              <span><i class="dot busy"></i>Digunakan</span>
+              <span><i class="dot completed"></i>Selesai</span>
+              <span><i class="dot maintenance"></i>Maintenance</span>
+            </div>
+          </div>
+          <div id="operationMachineGrid" class="machine-grid"></div>
+        </section>
+
+        <section class="recent">
+          <div class="section-head">
+            <div>
+              <h2>Aktivitas Terbaru</h2>
+              <p>Transaksi paling baru untuk membantu kasir memantau operasional.</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Waktu</th><th>Mesin</th><th>Berat</th><th>Layanan</th><th>Pembayaran</th><th>Koin</th><th>Total</th><th>Status</th></tr>
+              </thead>
+              <tbody id="operationTransactionTable"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <section id="view-transactions" class="app-view hidden-view">
+        <div class="page-head">
+          <div>
+            <span class="eyebrow">Riwayat Transaksi</span>
+            <h1>Arsip Transaksi</h1>
+            <p>Cari, filter, dan periksa transaksi yang sudah tercatat.</p>
+          </div>
+          <button id="newTransactionTransactions" class="hero-action">+ Transaksi Baru</button>
+        </div>
+
+        <div class="filter-bar">
+          <input id="txSearch" type="search" placeholder="Cari mesin, layanan, pembayaran...">
+          <select id="txPaymentFilter">
+            <option value="all">Semua Pembayaran</option>
+            <option value="Cash">Cash</option>
+            <option value="QRIS">QRIS</option>
+          </select>
+          <select id="txStatusFilter">
+            <option value="all">Semua Status</option>
+            <option value="Berjalan">Berjalan</option>
+            <option value="Selesai">Selesai</option>
+          </select>
+          <select id="txMachineFilter">
+            <option value="all">Semua Mesin</option>
+            <option value="1">Mesin 01</option>
+            <option value="2">Mesin 02</option>
+            <option value="3">Mesin 03</option>
+            <option value="4">Mesin 04</option>
+            <option value="5">Mesin 05</option>
+            <option value="6">Mesin 06</option>
+            <option value="7">Mesin 07</option>
+            <option value="8">Mesin 08</option>
+          </select>
+          <button id="resetTxFilter" class="ghost-filter">Reset</button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Waktu</th><th>Mesin</th><th>Berat</th><th>Layanan</th><th>Pembayaran</th><th>Koin</th><th>Total</th><th>Status</th></tr>
+            </thead>
+            <tbody id="allTransactionTable"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="view-reports" class="app-view hidden-view">
+        <div class="page-head">
+          <div>
+            <span class="eyebrow">Laporan</span>
+            <h1>Laporan Operasional</h1>
+            <p>Ringkasan omzet, pembayaran, penggunaan mesin, dan transaksi.</p>
+          </div>
+          <button id="exportReportBtn" class="hero-action">Export CSV</button>
+        </div>
+
+        <div class="stats report-stats">
+          <article><span>Total Omzet</span><strong id="reportRevenue">Rp0</strong><small>Semua transaksi</small></article>
+          <article><span>Total Transaksi</span><strong id="reportTxCount">0</strong><small>Transaksi tercatat</small></article>
+          <article><span>Cash</span><strong id="reportCash">Rp0</strong><small>Transaksi tunai</small></article>
+          <article><span>QRIS</span><strong id="reportQris">Rp0</strong><small>Transaksi digital</small></article>
+        </div>
+
+        <div class="report-grid">
+          <article class="report-card">
+            <div class="report-card-head">
+              <div>
+                <h3>Metode Pembayaran</h3>
+                <p>Perbandingan Cash dan QRIS.</p>
+              </div>
+            </div>
+            <div class="bar-list">
+              <div class="bar-item">
+                <div class="bar-label"><span>Cash</span><strong id="cashPercentText">0%</strong></div>
+                <div class="bar-track"><i id="cashBar"></i></div>
+              </div>
+              <div class="bar-item">
+                <div class="bar-label"><span>QRIS</span><strong id="qrisPercentText">0%</strong></div>
+                <div class="bar-track"><i id="qrisBar"></i></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="report-card">
+            <div class="report-card-head">
+              <div>
+                <h3>Penggunaan Mesin</h3>
+                <p>Jumlah transaksi per mesin.</p>
+              </div>
+            </div>
+            <div id="machineUsageList" class="usage-list"></div>
+          </article>
+        </div>
+
+        <div class="recent">
+          <div class="section-head">
+            <div>
+              <h2>Ringkasan Transaksi</h2>
+              <p>Data transaksi untuk laporan.</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Waktu</th><th>Mesin</th><th>Layanan</th><th>Pembayaran</th><th>Koin</th><th>Total</th></tr>
+              </thead>
+              <tbody id="reportTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+
+      <section id="view-machines" class="app-view hidden-view">
+        <div class="page-head">
+          <div>
+            <span class="eyebrow">Mesin</span>
+            <h1>Manajemen Mesin</h1>
+            <p>Kelola data mesin, jenis, kapasitas, status, dan maintenance.</p>
+          </div>
+          <button id="addMachineBtn" class="hero-action">+ Tambah Mesin</button>
+        </div>
+
+        <div class="machine-admin-summary">
+          <article><span>Total Mesin</span><strong id="machineTotal">0</strong><small>Terdaftar</small></article>
+          <article><span>Tersedia</span><strong id="machineAvailable">0</strong><small>Siap digunakan</small></article>
+          <article><span>Digunakan</span><strong id="machineBusy">0</strong><small>Sedang aktif</small></article>
+          <article><span>Maintenance</span><strong id="machineMaintenance">0</strong><small>Perlu pengecekan</small></article>
+        </div>
+
+        <div class="filter-bar machine-filter-bar">
+          <input id="machineSearch" type="search" placeholder="Cari nomor, jenis, kapasitas...">
+          <select id="machineStatusFilter">
+            <option value="all">Semua Status</option>
+            <option value="available">Tersedia</option>
+            <option value="busy">Digunakan</option>
+            <option value="completed">Selesai</option>
+            <option value="maintenance">Maintenance</option>
+          </select>
+          <select id="machineTypeFilter">
+            <option value="all">Semua Jenis</option>
+            <option value="Mesin Cuci">Mesin Cuci</option>
+            <option value="Dryer">Dryer</option>
+          </select>
+          <button id="resetMachineFilter" class="ghost-filter">Reset</button>
+        </div>
+
+        <div id="machineAdminGrid" class="machine-admin-grid"></div>
+      </section>
+
+
+      <section id="view-services" class="app-view hidden-view">
+        <div class="page-head">
+          <div>
+            <span class="eyebrow">Harga & Layanan</span>
+            <h1>Pengaturan Layanan</h1>
+            <p>Kelola nama layanan, harga, satuan, durasi, jenis mesin, dan status aktif.</p>
+          </div>
+          <button id="addServiceBtn" class="hero-action">+ Tambah Layanan</button>
+        </div>
+
+        <div class="service-summary">
+          <article><span>Total Layanan</span><strong id="serviceTotal">0</strong><small>Terdaftar</small></article>
+          <article><span>Layanan Aktif</span><strong id="serviceActive">0</strong><small>Bisa dipilih kasir</small></article>
+          <article><span>Cuci + Dryer</span><strong id="mainServicePrice">Rp0</strong><small>Harga per 7 kg</small></article>
+          <article><span>Dryer</span><strong id="dryerServicePrice">Rp0</strong><small>Harga paket</small></article>
+        </div>
+
+        <div class="filter-bar service-filter-bar">
+          <input id="serviceSearch" type="search" placeholder="Cari nama layanan...">
+          <select id="serviceTypeFilter">
+            <option value="all">Semua Jenis Mesin</option>
+            <option value="Mesin Cuci">Mesin Cuci</option>
+            <option value="Dryer">Dryer</option>
+          </select>
+          <select id="serviceStatusFilter">
+            <option value="all">Semua Status</option>
+            <option value="active">Aktif</option>
+            <option value="inactive">Nonaktif</option>
+          </select>
+          <button id="resetServiceFilter" class="ghost-filter">Reset</button>
+        </div>
+
+        <div id="serviceAdminGrid" class="service-admin-grid"></div>
+      </section>
+
+      <section id="view-placeholder" class="app-view hidden-view">
+        <div class="page-head">
+          <div>
+            <span class="eyebrow">Dalam Pengembangan</span>
+            <h1 id="placeholderTitle">Menu</h1>
+            <p>Halaman ini akan kita aktifkan pada tahap berikutnya.</p>
+          </div>
+        </div>
+        <div class="empty-state">
+          <div class="empty-icon">⚙</div>
+          <h3>Modul berikutnya</h3>
+          <p>Kita akan lanjutkan setelah Transaksi dan Laporan stabil.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <nav class="mobile-nav">
+    <button class="active" data-mobile-view="dashboard">⌂<span>Dashboard</span></button>
+    <button data-mobile-view="operations">◈<span>Operasional</span></button>
+    <button data-mobile-view="transactions">▤<span>Riwayat</span></button>
+    <button id="mobileNewTx">＋<span>Transaksi</span></button>
+  </nav>
+
+  <div id="txBackdrop" class="modal-backdrop hidden">
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <span class="eyebrow">Transaksi Baru</span>
+          <h3>Input Transaksi Kasir</h3>
+        </div>
+        <button id="closeTx" class="icon-btn">×</button>
+      </div>
+
+      <div class="tx-steps">
+        <span class="active">1. Cucian</span>
+        <span>2. Pembayaran</span>
+        <span>3. Koin</span>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">Detail Cucian</div>
+        <div class="form-grid">
+          <label>Mesin
+            <select id="machineSelect"></select>
+          </label>
+          <label>Berat Cucian (kg)
+            <input id="weightInput" type="number" min="0.5" step="0.5" value="5">
+          </label>
+          <label>Layanan
+            <select id="serviceSelect"></select>
+          </label>
+          <label>Nama / Catatan Pelanggan
+            <input id="customerInput" type="text" placeholder="Opsional, contoh: Pak Budi">
+          </label>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">Pembayaran</div>
+        <div class="form-grid">
+          <label>Metode Pembayaran
+            <select id="paymentSelect">
+              <option value="Cash">Cash</option>
+              <option value="QRIS">QRIS</option>
+            </select>
+          </label>
+          <label>Total Bayar
+            <input id="totalInput" type="text" readonly>
+          </label>
+          <label id="cashReceivedLabel">Uang Diterima
+            <input id="cashReceivedInput" type="number" min="0" step="1000" placeholder="Contoh: 50000">
+          </label>
+          <label id="changeLabel">Kembalian
+            <input id="changeInput" type="text" readonly value="Rp0">
+          </label>
+        </div>
+
+        <div id="qrisConfirmBox" class="qris-confirm hidden-inline">
+          <label class="check-row">
+            <input id="qrisConfirmed" type="checkbox">
+            <span>QRIS sudah diterima / terkonfirmasi</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">Koin / Token</div>
+        <div class="coin-row">
+          <div>
+            <span class="coin-label">Jumlah koin diberikan</span>
+            <div class="coin-stepper">
+              <button type="button" id="coinMinus">−</button>
+              <input id="coinInput" type="number" min="1" value="1">
+              <button type="button" id="coinPlus">+</button>
+            </div>
+          </div>
+          <div class="token-note">Serahkan koin/token setelah pembayaran berhasil dicatat.</div>
+        </div>
+      </div>
+
+      <div class="summary-box">
+        <div><span>Mesin</span><strong id="sumMachine">-</strong></div>
+        <div><span>Berat</span><strong id="sumWeight">-</strong></div>
+        <div><span>Pembayaran</span><strong id="sumPayment">-</strong></div>
+        <div><span>Total</span><strong id="sumTotal">Rp0</strong></div>
+      </div>
+
+      <button id="saveTx" class="primary-btn">Konfirmasi Transaksi & Serahkan Koin</button>
+    </div>
+  </div>
+
+
+
+  <div id="serviceBackdrop" class="modal-backdrop hidden">
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <span class="eyebrow">Harga & Layanan</span>
+          <h3 id="serviceModalTitle">Tambah Layanan</h3>
+        </div>
+        <button id="closeServiceModal" class="icon-btn">×</button>
+      </div>
+
+      <div class="form-grid">
+        <label>Nama Layanan
+          <input id="serviceNameInput" type="text" placeholder="Contoh: Cuci + Dryer">
+        </label>
+        <label>Jenis Mesin
+          <select id="serviceTypeInput">
+            <option value="Mesin Cuci">Mesin Cuci</option>
+            <option value="Dryer">Dryer</option>
+          </select>
+        </label>
+        <label>Harga
+          <input id="servicePriceInput" type="number" min="0" step="1000" placeholder="35000">
+        </label>
+        <label>Satuan
+          <select id="serviceUnitInput">
+            <option value="7kg">Per 7 Kg</option>
+            <option value="kg">Per Kg</option>
+            <option value="paket">Per Paket</option>
+          </select>
+        </label>
+        <label>Durasi Default (menit)
+          <input id="serviceDurationInput" type="number" min="1" value="35">
+        </label>
+        <label>Status
+          <select id="serviceActiveInput">
+            <option value="active">Aktif</option>
+            <option value="inactive">Nonaktif</option>
+          </select>
+        </label>
+        <label style="grid-column:1/-1">Catatan
+          <input id="serviceNoteInput" type="text" placeholder="Opsional">
+        </label>
+      </div>
+
+      <div class="machine-modal-actions">
+        <button id="deleteServiceBtn" class="danger-btn hidden-inline">Hapus Layanan</button>
+        <button id="saveServiceBtn" class="primary-btn">Simpan Layanan</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="machineBackdrop" class="modal-backdrop hidden">
+    <div class="modal machine-modal">
+      <div class="modal-head">
+        <div>
+          <span class="eyebrow">Manajemen Mesin</span>
+          <h3 id="machineModalTitle">Tambah Mesin</h3>
+        </div>
+        <button id="closeMachineModal" class="icon-btn">×</button>
+      </div>
+
+      <div class="form-grid">
+        <label>Nomor Mesin
+          <input id="machineNumberInput" type="number" min="1" placeholder="Contoh: 9">
+        </label>
+        <label>Jenis Mesin
+          <select id="machineTypeInput">
+            <option value="Mesin Cuci">Mesin Cuci</option>
+            <option value="Dryer">Dryer</option>
+          </select>
+        </label>
+        <label>Kapasitas
+          <input id="machineCapacityInput" type="text" placeholder="Contoh: 10 KG">
+        </label>
+        <label>Status
+          <select id="machineStatusInput">
+            <option value="available">Tersedia</option>
+            <option value="busy">Digunakan</option>
+            <option value="completed">Selesai</option>
+            <option value="maintenance">Maintenance</option>
+          </select>
+        </label>
+        <label>Durasi Default (menit)
+          <input id="machineDurationInput" type="number" min="1" value="35">
+        </label>
+        <label>Catatan
+          <input id="machineNoteInput" type="text" placeholder="Opsional">
+        </label>
+      </div>
+
+      <div class="machine-modal-actions">
+        <button id="deleteMachineBtn" class="danger-btn hidden-inline">Hapus Mesin</button>
+        <button id="saveMachineBtn" class="primary-btn">Simpan Mesin</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="successBackdrop" class="modal-backdrop hidden">
+    <div class="modal success-modal">
+      <div class="success-icon">✓</div>
+      <h3>Transaksi Tersimpan</h3>
+      <p id="successText"></p>
+      <button id="doneBtn" class="primary-btn">Selesai</button>
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
