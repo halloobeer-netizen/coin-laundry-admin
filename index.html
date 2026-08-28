@@ -56,7 +56,6 @@
         </div>
       </header>
 
-      
       <section id="view-dashboard" class="app-view">
         <div class="page-head dashboard-head">
           <div>
@@ -266,7 +265,6 @@
         </div>
       </section>
 
-
       <section id="view-machines" class="app-view hidden-view">
         <div class="page-head">
           <div>
@@ -304,7 +302,6 @@
         <div id="machineAdminGrid" class="machine-admin-grid"></div>
       </section>
 
-
       <section id="view-services" class="app-view hidden-view">
         <div class="page-head">
           <div>
@@ -340,12 +337,12 @@
         <div id="serviceAdminGrid" class="service-admin-grid"></div>
       </section>
 
-      <section id="view-placeholder" class="app-view hidden-view">
+      <section id="view-settings" class="app-view hidden-view">
         <div class="page-head">
           <div>
-            <span class="eyebrow">Dalam Pengembangan</span>
-            <h1 id="placeholderTitle">Menu</h1>
-            <p>Halaman ini akan kita aktifkan pada tahap berikutnya.</p>
+            <span class="eyebrow">Pengaturan</span>
+            <h1>Pengaturan Aplikasi</h1>
+            <p>Profil outlet dan preferensi aplikasi akan dikelola dari halaman ini.</p>
           </div>
         </div>
         <div class="empty-state">
@@ -373,193 +370,47 @@
         </div>
         <button id="closeTx" class="icon-btn">×</button>
       </div>
-
-      <div class="tx-steps">
-        <span class="active">1. Cucian</span>
-        <span>2. Pembayaran</span>
-        <span>3. Koin</span>
-      </div>
-
-      <div class="form-section">
-        <div class="form-section-title">Detail Cucian</div>
-        <div class="form-grid">
-          <label>Mesin
-            <select id="machineSelect"></select>
-          </label>
-          <label>Berat Cucian (kg)
-            <input id="weightInput" type="number" min="0.5" step="0.5" value="5">
-          </label>
-          <label>Layanan
-            <select id="serviceSelect"></select>
-          </label>
-          <label>Nama / Catatan Pelanggan
-            <input id="customerInput" type="text" placeholder="Opsional, contoh: Pak Budi">
-          </label>
-        </div>
-      </div>
-
-      <div class="form-section">
-        <div class="form-section-title">Pembayaran</div>
-        <div class="form-grid">
-          <label>Metode Pembayaran
-            <select id="paymentSelect">
-              <option value="Cash">Cash</option>
-              <option value="QRIS">QRIS</option>
-            </select>
-          </label>
-          <label>Total Bayar
-            <input id="totalInput" type="text" readonly>
-          </label>
-          <label id="cashReceivedLabel">Uang Diterima
-            <input id="cashReceivedInput" type="number" min="0" step="1000" placeholder="Contoh: 50000">
-          </label>
-          <label id="changeLabel">Kembalian
-            <input id="changeInput" type="text" readonly value="Rp0">
-          </label>
-        </div>
-
-        <div id="qrisConfirmBox" class="qris-confirm hidden-inline">
-          <label class="check-row">
-            <input id="qrisConfirmed" type="checkbox">
-            <span>QRIS sudah diterima / terkonfirmasi</span>
-          </label>
-        </div>
-      </div>
-
-      <div class="form-section">
-        <div class="form-section-title">Koin / Token</div>
-        <div class="coin-row">
-          <div>
-            <span class="coin-label">Jumlah koin diberikan</span>
-            <div class="coin-stepper">
-              <button type="button" id="coinMinus">−</button>
-              <input id="coinInput" type="number" min="1" value="1">
-              <button type="button" id="coinPlus">+</button>
-            </div>
-          </div>
-          <div class="token-note">Serahkan koin/token setelah pembayaran berhasil dicatat.</div>
-        </div>
-      </div>
-
-      <div class="summary-box">
-        <div><span>Mesin</span><strong id="sumMachine">-</strong></div>
-        <div><span>Berat</span><strong id="sumWeight">-</strong></div>
-        <div><span>Pembayaran</span><strong id="sumPayment">-</strong></div>
-        <div><span>Total</span><strong id="sumTotal">Rp0</strong></div>
-      </div>
-
+      <div class="tx-steps"><span class="active">1. Cucian</span><span>2. Pembayaran</span><span>3. Koin</span></div>
+      <div class="form-section"><div class="form-section-title">Detail Cucian</div><div class="form-grid">
+        <label>Mesin<select id="machineSelect"></select></label>
+        <label>Berat Cucian (kg)<input id="weightInput" type="number" min="0.5" step="0.5" value="5"></label>
+        <label>Layanan<select id="serviceSelect"></select></label>
+        <label>Nama / Catatan Pelanggan<input id="customerInput" type="text" placeholder="Opsional, contoh: Pak Budi"></label>
+      </div></div>
+      <div class="form-section"><div class="form-section-title">Pembayaran</div><div class="form-grid">
+        <label>Metode Pembayaran<select id="paymentSelect"><option value="Cash">Cash</option><option value="QRIS">QRIS</option></select></label>
+        <label>Total Bayar<input id="totalInput" type="text" readonly></label>
+        <label id="cashReceivedLabel">Uang Diterima<input id="cashReceivedInput" type="number" min="0" step="1000" placeholder="Contoh: 50000"></label>
+        <label id="changeLabel">Kembalian<input id="changeInput" type="text" readonly value="Rp0"></label>
+      </div><div id="qrisConfirmBox" class="qris-confirm hidden-inline"><label class="check-row"><input id="qrisConfirmed" type="checkbox"><span>QRIS sudah diterima / terkonfirmasi</span></label></div></div>
+      <div class="form-section"><div class="form-section-title">Koin / Token</div><div class="coin-row"><div><span class="coin-label">Jumlah koin diberikan</span><div class="coin-stepper"><button type="button" id="coinMinus">−</button><input id="coinInput" type="number" min="1" value="1"><button type="button" id="coinPlus">+</button></div></div><div class="token-note">Serahkan koin/token setelah pembayaran berhasil dicatat.</div></div></div>
+      <div class="summary-box"><div><span>Mesin</span><strong id="sumMachine">-</strong></div><div><span>Berat</span><strong id="sumWeight">-</strong></div><div><span>Pembayaran</span><strong id="sumPayment">-</strong></div><div><span>Total</span><strong id="sumTotal">Rp0</strong></div></div>
       <button id="saveTx" class="primary-btn">Konfirmasi Transaksi & Serahkan Koin</button>
     </div>
   </div>
 
+  <div id="serviceBackdrop" class="modal-backdrop hidden"><div class="modal"><div class="modal-head"><div><span class="eyebrow">Harga & Layanan</span><h3 id="serviceModalTitle">Tambah Layanan</h3></div><button id="closeServiceModal" class="icon-btn">×</button></div><div class="form-grid">
+    <label>Nama Layanan<input id="serviceNameInput" type="text" placeholder="Contoh: Cuci + Dryer"></label>
+    <label>Jenis Mesin<select id="serviceTypeInput"><option value="Mesin Cuci">Mesin Cuci</option><option value="Dryer">Dryer</option></select></label>
+    <label>Harga<input id="servicePriceInput" type="number" min="0" step="1000" placeholder="35000"></label>
+    <label>Satuan<select id="serviceUnitInput"><option value="7kg">Per 7 Kg</option><option value="kg">Per Kg</option><option value="paket">Per Paket</option></select></label>
+    <label>Durasi Default (menit)<input id="serviceDurationInput" type="number" min="1" value="35"></label>
+    <label>Status<select id="serviceActiveInput"><option value="active">Aktif</option><option value="inactive">Nonaktif</option></select></label>
+    <label style="grid-column:1/-1">Catatan<input id="serviceNoteInput" type="text" placeholder="Opsional"></label>
+  </div><div class="machine-modal-actions"><button id="deleteServiceBtn" class="danger-btn hidden-inline">Hapus Layanan</button><button id="saveServiceBtn" class="primary-btn">Simpan Layanan</button></div></div></div>
 
+  <div id="machineBackdrop" class="modal-backdrop hidden"><div class="modal machine-modal"><div class="modal-head"><div><span class="eyebrow">Manajemen Mesin</span><h3 id="machineModalTitle">Tambah Mesin</h3></div><button id="closeMachineModal" class="icon-btn">×</button></div><div class="form-grid">
+    <label>Nomor Mesin<input id="machineNumberInput" type="number" min="1" placeholder="Contoh: 9"></label>
+    <label>Jenis Mesin<select id="machineTypeInput"><option value="Mesin Cuci">Mesin Cuci</option><option value="Dryer">Dryer</option></select></label>
+    <label>Kapasitas<input id="machineCapacityInput" type="text" placeholder="Contoh: 10 KG"></label>
+    <label>Status<select id="machineStatusInput"><option value="available">Tersedia</option><option value="busy">Digunakan</option><option value="completed">Selesai</option><option value="maintenance">Maintenance</option></select></label>
+    <label>Durasi Default (menit)<input id="machineDurationInput" type="number" min="1" value="35"></label>
+    <label>Catatan<input id="machineNoteInput" type="text" placeholder="Opsional"></label>
+  </div><div class="machine-modal-actions"><button id="deleteMachineBtn" class="danger-btn hidden-inline">Hapus Mesin</button><button id="saveMachineBtn" class="primary-btn">Simpan Mesin</button></div></div></div>
 
-  <div id="serviceBackdrop" class="modal-backdrop hidden">
-    <div class="modal">
-      <div class="modal-head">
-        <div>
-          <span class="eyebrow">Harga & Layanan</span>
-          <h3 id="serviceModalTitle">Tambah Layanan</h3>
-        </div>
-        <button id="closeServiceModal" class="icon-btn">×</button>
-      </div>
-
-      <div class="form-grid">
-        <label>Nama Layanan
-          <input id="serviceNameInput" type="text" placeholder="Contoh: Cuci + Dryer">
-        </label>
-        <label>Jenis Mesin
-          <select id="serviceTypeInput">
-            <option value="Mesin Cuci">Mesin Cuci</option>
-            <option value="Dryer">Dryer</option>
-          </select>
-        </label>
-        <label>Harga
-          <input id="servicePriceInput" type="number" min="0" step="1000" placeholder="35000">
-        </label>
-        <label>Satuan
-          <select id="serviceUnitInput">
-            <option value="7kg">Per 7 Kg</option>
-            <option value="kg">Per Kg</option>
-            <option value="paket">Per Paket</option>
-          </select>
-        </label>
-        <label>Durasi Default (menit)
-          <input id="serviceDurationInput" type="number" min="1" value="35">
-        </label>
-        <label>Status
-          <select id="serviceActiveInput">
-            <option value="active">Aktif</option>
-            <option value="inactive">Nonaktif</option>
-          </select>
-        </label>
-        <label style="grid-column:1/-1">Catatan
-          <input id="serviceNoteInput" type="text" placeholder="Opsional">
-        </label>
-      </div>
-
-      <div class="machine-modal-actions">
-        <button id="deleteServiceBtn" class="danger-btn hidden-inline">Hapus Layanan</button>
-        <button id="saveServiceBtn" class="primary-btn">Simpan Layanan</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="machineBackdrop" class="modal-backdrop hidden">
-    <div class="modal machine-modal">
-      <div class="modal-head">
-        <div>
-          <span class="eyebrow">Manajemen Mesin</span>
-          <h3 id="machineModalTitle">Tambah Mesin</h3>
-        </div>
-        <button id="closeMachineModal" class="icon-btn">×</button>
-      </div>
-
-      <div class="form-grid">
-        <label>Nomor Mesin
-          <input id="machineNumberInput" type="number" min="1" placeholder="Contoh: 9">
-        </label>
-        <label>Jenis Mesin
-          <select id="machineTypeInput">
-            <option value="Mesin Cuci">Mesin Cuci</option>
-            <option value="Dryer">Dryer</option>
-          </select>
-        </label>
-        <label>Kapasitas
-          <input id="machineCapacityInput" type="text" placeholder="Contoh: 10 KG">
-        </label>
-        <label>Status
-          <select id="machineStatusInput">
-            <option value="available">Tersedia</option>
-            <option value="busy">Digunakan</option>
-            <option value="completed">Selesai</option>
-            <option value="maintenance">Maintenance</option>
-          </select>
-        </label>
-        <label>Durasi Default (menit)
-          <input id="machineDurationInput" type="number" min="1" value="35">
-        </label>
-        <label>Catatan
-          <input id="machineNoteInput" type="text" placeholder="Opsional">
-        </label>
-      </div>
-
-      <div class="machine-modal-actions">
-        <button id="deleteMachineBtn" class="danger-btn hidden-inline">Hapus Mesin</button>
-        <button id="saveMachineBtn" class="primary-btn">Simpan Mesin</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="successBackdrop" class="modal-backdrop hidden">
-    <div class="modal success-modal">
-      <div class="success-icon">✓</div>
-      <h3>Transaksi Tersimpan</h3>
-      <p id="successText"></p>
-      <button id="doneBtn" class="primary-btn">Selesai</button>
-    </div>
-  </div>
+  <div id="successBackdrop" class="modal-backdrop hidden"><div class="modal success-modal"><div class="success-icon">✓</div><h3>Transaksi Tersimpan</h3><p id="successText"></p><button id="doneBtn" class="primary-btn">Selesai</button></div></div>
 
   <script src="./app.js"></script>
+  <script src="./db-sync.js"></script>
 </body>
 </html>
