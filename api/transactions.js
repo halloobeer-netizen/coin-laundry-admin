@@ -1,7 +1,9 @@
 const { getSql, sendError } = require('./_db');
+const { requireAuth } = require('./_auth');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error:'Method not allowed' });
+  if (!requireAuth(req, res)) return;
   try {
     const sql=getSql();
     const b=req.body||{};
