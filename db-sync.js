@@ -1,5 +1,6 @@
 (() => {
   let dbReady = false;
+  const completingMachines = new Set();
 
   async function api(url, options = {}) {
     const response = await fetch(url, {
@@ -37,11 +38,32 @@
     renderMachines(); renderTransactions(); renderMachineAdmin(); renderServiceAdmin(); updateCountdowns();
   }
 
+  async function persistCompletion(id) {
+    if (!dbReady || completingMachines.has(id)) return;
+    completingMachines.add(id);
+    try {
+      await api('/api/machines', { method: 'PATCH', body: JSON.stringify({ id, status: 'completed' }) });
+      await reloadDb();
+    } catch (err) {
+      console.warn(`Gagal menyimpan selesai Mesin ${id}:`, err.message);
+    } finally {
+      completingMachines.delete(id);
+    }
+  }
+
   const localSetMachineStatus = setMachineStatus;
   setMachineStatus = async function(id, status) {
     if (!dbReady) return localSetMachineStatus(id, status);
     const machine = machines.find(m => m.id === id); if (!machine) return;
-    try { await api('/api/machines', { method: 'PATCH', body: JSON.stringify({ id, status, note: machine.note || null }) }); await reloadDb(); }
+    try {
+      // Jika admin menekan "Tersedia Lagi" setelah timer selesai lokal,
+      // selesaikan transaksi di database lebih dulu agar riwayat konsisten.
+      if (status === 'available' && machine.status === 'completed') {
+        await api('/api/machines', { method: 'PATCH', body: JSON.stringify({ id, status: 'completed', note: machine.note || null }) });
+      }
+      await api('/api/machines', { method: 'PATCH', body: JSON.stringify({ id, status, note: machine.note || null }) });
+      await reloadDb();
+    }
     catch (err) { alert(`Gagal menyimpan status mesin: ${err.message}`); }
   };
 
@@ -137,6 +159,19 @@
       await reloadDb();
     } catch (err) { alert(`Gagal menyimpan transaksi: ${err.message}`); }
   };
+
+  // Menjaga status selesai tetap persisten walaupun halaman dibiarkan terbuka.
+  // Ini juga menangkap kondisi ketika app.js sudah mengubah status menjadi completed secara lokal.
+  setInterval(() => {
+    if (!dbReady) return;
+    const now = Date.now();
+    machines.forEach(machine => {
+      const runningTx = transactions.some(t => t.machine === machine.id && t.status === 'Berjalan');
+      const timerExpired = machine.status === 'busy' && machine.finishAt && machine.finishAt <= now;
+      const locallyCompleted = machine.status === 'completed' && runningTx;
+      if (timerExpired || locallyCompleted) persistCompletion(machine.id);
+    });
+  }, 500);
 
   reloadDb().catch(err => console.warn('Neon belum terhubung:', err.message));
 })();
