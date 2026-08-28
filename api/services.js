@@ -1,6 +1,8 @@
 const { getSql, sendError } = require('./_db');
+const { requireAuth } = require('./_auth');
 
 module.exports = async function handler(req, res) {
+  if (!requireAuth(req, res)) return;
   try {
     const sql = getSql();
     if (req.method === 'POST') {
