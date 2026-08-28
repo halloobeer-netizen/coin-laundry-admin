@@ -1,7 +1,9 @@
 const { getSql, sendError } = require('./_db');
+const { requireAuth } = require('./_auth');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
+  if (!requireAuth(req, res)) return;
   try {
     const sql = getSql();
     await sql`UPDATE machines SET status='completed', finish_at=NULL, updated_at=now()
