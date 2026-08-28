@@ -1,4 +1,4 @@
-# Clean Wash Coin Laundry Admin V2.1
+# Clean Wash Coin Laundry Admin
 
 Peningkatan utama:
 - Flow transaksi kasir lebih jelas: Cucian → Pembayaran → Koin
