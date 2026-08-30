@@ -261,7 +261,7 @@ Never:
 9. Verify reports / CSV / PDF
 10. Verify mobile behavior
 
-## Mandatory Audit for Next AI
+## Mandatory Audit for Next
 Before coding, report:
 
 1. Static frontend structure
