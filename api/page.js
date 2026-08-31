@@ -5,6 +5,9 @@ module.exports = async function handler(req, res) {
   try {
     const file = path.join(process.cwd(), 'index.html');
     let html = fs.readFileSync(file, 'utf8');
+    if (!html.includes('./mobile-landscape-scroll.css')) {
+      html = html.replace('</head>', '  <link rel="stylesheet" href="./mobile-landscape-scroll.css" />\n</head>');
+    }
     if (!html.includes('./auth-ui.js')) {
       html = html.replace('<script src="./app.js"></script>', '<script src="./auth-ui.js"></script>\n  <script src="./app.js"></script>');
     }
