@@ -1,0 +1,22 @@
+/* Allow touch devices using the wider desktop/tablet layout in landscape
+   to pan horizontally instead of clipping content at the app-shell edge. */
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) and (min-width: 761px) {
+  html,
+  body {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  body {
+    touch-action: pan-x pan-y;
+  }
+
+  .app-shell {
+    min-width: 1000px;
+    overflow: visible;
+  }
+
+  .main {
+    min-width: 790px;
+  }
+}
