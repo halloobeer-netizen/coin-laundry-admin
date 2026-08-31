@@ -191,15 +191,122 @@
     return json({ error:'Demo endpoint tidak tersedia' }, 404);
   };
 
+  function openGuide() {
+    const guide = document.getElementById('demoGuideBackdrop');
+    if (!guide) return;
+    guide.classList.add('open');
+    guide.setAttribute('aria-hidden', 'false');
+  }
+
+  function closeGuide() {
+    const guide = document.getElementById('demoGuideBackdrop');
+    if (!guide) return;
+    guide.classList.remove('open');
+    guide.setAttribute('aria-hidden', 'true');
+  }
+
+  function goTo(view) {
+    closeGuide();
+    const sidebarButton = document.querySelector(`[data-view="${view}"]`);
+    const mobileButton = document.querySelector(`[data-mobile-view="${view}"]`);
+    (sidebarButton || mobileButton)?.click();
+  }
+
   function addDemoUi() {
     const style = document.createElement('style');
-    style.textContent = `.demo-ribbon{position:fixed;right:14px;top:14px;z-index:99998;background:#0d1734;color:#fff;border-radius:999px;padding:9px 13px;font:800 11px/1 Inter,system-ui,sans-serif;box-shadow:0 8px 24px rgba(13,23,52,.2)}.demo-ribbon small{font-weight:500;opacity:.75;margin-left:6px}`;
+    style.textContent = `
+      .demo-ribbon{position:fixed;right:14px;top:14px;z-index:99998;background:#0d1734;color:#fff;border-radius:999px;padding:9px 13px;font:800 11px/1 Inter,system-ui,sans-serif;box-shadow:0 8px 24px rgba(13,23,52,.2)}
+      .demo-ribbon small{font-weight:500;opacity:.75;margin-left:6px}
+      .demo-guide-fab{position:fixed;right:16px;bottom:18px;z-index:99960;border:0;border-radius:999px;padding:12px 16px;background:#234f8b;color:#fff;font:800 12px/1 Inter,system-ui,sans-serif;cursor:pointer;box-shadow:0 10px 28px rgba(35,79,139,.25)}
+      .demo-guide-backdrop{position:fixed;inset:0;z-index:99970;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(9,20,41,.58);font-family:Inter,system-ui,sans-serif;overflow:auto}
+      .demo-guide-backdrop.open{display:flex}
+      .demo-guide{width:min(680px,100%);max-height:calc(100dvh - 36px);overflow:auto;background:#fff;border-radius:22px;box-shadow:0 28px 80px rgba(8,24,52,.3)}
+      .demo-guide-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:24px 24px 18px;border-bottom:1px solid #e7edf5;position:sticky;top:0;background:#fff;z-index:2}
+      .demo-guide-head span{display:block;margin-bottom:6px;color:#315e9d;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+      .demo-guide-head h2{margin:0;color:#18283f;font-size:24px}
+      .demo-guide-close{border:1px solid #dce4ef;background:#fff;border-radius:10px;width:38px;height:38px;font-size:22px;cursor:pointer;color:#4c5a70}
+      .demo-guide-body{padding:22px 24px 24px;color:#40506a}
+      .demo-guide-intro{margin:0 0 18px;line-height:1.6;font-size:13px}
+      .demo-steps{display:grid;gap:10px;margin:0 0 20px;padding:0;list-style:none;counter-reset:demo-step}
+      .demo-steps li{counter-increment:demo-step;position:relative;padding:14px 14px 14px 52px;border:1px solid #e3e9f2;border-radius:14px;background:#fbfcfe;font-size:13px;line-height:1.5}
+      .demo-steps li:before{content:counter(demo-step);position:absolute;left:14px;top:13px;width:27px;height:27px;border-radius:50%;display:grid;place-items:center;background:#eaf1fb;color:#234f8b;font-weight:800}
+      .demo-steps strong{display:block;color:#1d2d45;margin-bottom:2px}
+      .demo-scenario{padding:16px;border-radius:15px;background:#eef5ff;border:1px solid #d6e5fb;margin-bottom:18px}
+      .demo-scenario strong{display:block;color:#183b69;margin-bottom:8px}
+      .demo-scenario p{margin:0;font-size:13px;line-height:1.6;color:#415b7e}
+      .demo-guide-note{font-size:12px;line-height:1.5;color:#75839a;margin-bottom:18px}
+      .demo-guide-actions{display:flex;flex-wrap:wrap;gap:10px}
+      .demo-guide-actions button{border:1px solid #d9e2ee;border-radius:11px;padding:11px 14px;background:#fff;color:#34475f;font-weight:800;cursor:pointer}
+      .demo-guide-actions .primary{border-color:#234f8b;background:#234f8b;color:#fff}
+      .demo-guide-actions .danger-lite{color:#a43a45}
+      @media(max-width:620px){.demo-ribbon{right:8px;top:8px}.demo-ribbon small{display:none}.demo-guide-fab{right:10px;bottom:12px}.demo-guide-head,.demo-guide-body{padding-left:18px;padding-right:18px}.demo-guide-head h2{font-size:21px}.demo-guide-actions button{flex:1 1 100%}}
+    `;
     document.head.appendChild(style);
+
     const badge = document.createElement('div');
     badge.className = 'demo-ribbon';
     badge.innerHTML = 'DEMO — JAGAVRE LABS <small>data reset saat refresh</small>';
     document.body.appendChild(badge);
+
+    const helpButton = document.createElement('button');
+    helpButton.type = 'button';
+    helpButton.className = 'demo-guide-fab';
+    helpButton.textContent = '? Panduan Demo';
+    helpButton.setAttribute('aria-label', 'Buka panduan penggunaan demo');
+    helpButton.onclick = openGuide;
+    document.body.appendChild(helpButton);
+
+    const guide = document.createElement('div');
+    guide.id = 'demoGuideBackdrop';
+    guide.className = 'demo-guide-backdrop';
+    guide.setAttribute('aria-hidden', 'true');
+    guide.innerHTML = `
+      <section class="demo-guide" role="dialog" aria-modal="true" aria-labelledby="demoGuideTitle">
+        <div class="demo-guide-head">
+          <div><span>Coin Laundry Management System</span><h2 id="demoGuideTitle">Cara Menggunakan Demo</h2></div>
+          <button type="button" class="demo-guide-close" id="demoGuideClose" aria-label="Tutup panduan">×</button>
+        </div>
+        <div class="demo-guide-body">
+          <p class="demo-guide-intro">Demo ini memungkinkan Anda mencoba alur kerja admin laundry dari transaksi pelanggan sampai pemantauan mesin dan laporan. Semua data di halaman ini adalah data simulasi.</p>
+          <ol class="demo-steps">
+            <li><strong>1. Lihat Dashboard</strong>Periksa omzet, pembayaran Cash/QRIS, aktivitas terbaru, dan ringkasan status mesin.</li>
+            <li><strong>2. Buka Operasional</strong>Pilih mesin dengan status <b>Tersedia</b> untuk menjalankan transaksi pelanggan baru.</li>
+            <li><strong>3. Buat Transaksi</strong>Pilih layanan, masukkan berat cucian, pilih Cash atau QRIS, lalu konfirmasi pembayaran dan token.</li>
+            <li><strong>4. Pantau Mesin</strong>Setelah transaksi, mesin berubah menjadi digunakan dan timer berjalan otomatis sampai selesai.</li>
+            <li><strong>5. Cek Riwayat & Laporan</strong>Transaksi langsung tercatat dan dapat dilihat pada Riwayat serta Laporan operasional.</li>
+          </ol>
+          <div class="demo-scenario">
+            <strong>Skenario yang disarankan</strong>
+            <p>Pilih <b>Mesin 01</b> → layanan <b>Cuci + Dryer</b> → berat <b>6 kg</b> → pembayaran <b>Cash</b> → uang diterima <b>Rp50.000</b>. Total seharusnya Rp35.000 untuk maksimal 7 kg. Setelah transaksi, lihat perubahan status mesin, timer, omzet, riwayat, dan laporan.</p>
+          </div>
+          <div class="demo-guide-note">Tidak ada transaksi demo yang masuk ke database produksi. Refresh halaman akan mengembalikan data simulasi ke kondisi awal.</div>
+          <div class="demo-guide-actions">
+            <button type="button" class="primary" id="demoStartOperations">Mulai dari Operasional</button>
+            <button type="button" id="demoOpenTransaction">Buat Transaksi</button>
+            <button type="button" id="demoOpenReports">Lihat Laporan</button>
+            <button type="button" class="danger-lite" id="demoReset">Reset Demo</button>
+          </div>
+        </div>
+      </section>`;
+    document.body.appendChild(guide);
+
+    document.getElementById('demoGuideClose').onclick = closeGuide;
+    guide.addEventListener('click', (event) => { if (event.target === guide) closeGuide(); });
+    document.getElementById('demoStartOperations').onclick = () => goTo('operations');
+    document.getElementById('demoOpenReports').onclick = () => goTo('reports');
+    document.getElementById('demoOpenTransaction').onclick = () => {
+      closeGuide();
+      const txButton = document.getElementById('newTransactionTop') || document.getElementById('newTransactionHero') || document.getElementById('mobileNewTx');
+      txButton?.click();
+    };
+    document.getElementById('demoReset').onclick = () => location.reload();
+    document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeGuide(); });
+
     document.title = 'DEMO — Clean Wash Coin Laundry Admin';
+    if (!sessionStorage.getItem('jagavreDemoGuideSeen')) {
+      sessionStorage.setItem('jagavreDemoGuideSeen', '1');
+      setTimeout(openGuide, 700);
+    }
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', addDemoUi);
