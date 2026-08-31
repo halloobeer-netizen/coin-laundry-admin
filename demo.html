@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Memuat Demo Coin Laundry...</title>
+  <style>
+    body{margin:0;display:grid;place-items:center;min-height:100vh;background:#f4f8fc;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:#0d1734}
+    .loading{padding:24px;text-align:center}.loading strong{display:block;font-size:18px;margin-bottom:8px}.loading span{color:#71809b;font-size:13px}
+  </style>
+</head>
+<body>
+  <div class="loading"><strong>Memuat Demo Coin Laundry</strong><span>JAGAVRE LABS</span></div>
+  <script>
+    (async()=>{
+      try{
+        const response=await fetch('/index.html',{cache:'no-store'});
+        if(!response.ok) throw new Error('Gagal mengambil aplikasi');
+        let html=await response.text();
+        html=html.replace('<title>Clean Wash Admin</title>','<title>DEMO — Clean Wash Coin Laundry Admin</title>');
+        html=html.replace('<script src="./auth-ui.js"></script>','<script src="./demo-mode.js?v=1"></script>\n  <script src="./auth-ui.js"></script>');
+        document.open();
+        document.write(html);
+        document.close();
+      }catch(error){
+        document.body.innerHTML='<div class="loading"><strong>Demo gagal dimuat</strong><span>Silakan refresh halaman.</span></div>';
+      }
+    })();
+  </script>
+</body>
+</html>
