@@ -7,7 +7,43 @@ module.exports = async function handler(req, res) {
     let html = fs.readFileSync(file, 'utf8');
 
     if (!html.includes('./mobile-landscape-scroll.css')) {
-      html = html.replace('</head>', '  <link rel="stylesheet" href="./mobile-landscape-scroll.css" />\n</head>');
+      html = html.replace('</head>', '  <link rel="stylesheet" href="./mobile-landscape-scroll.css?v=20260831-2" />\n</head>');
+    }
+
+    if (!html.includes('id="mobilePanFix"')) {
+      html = html.replace('</head>', `  <style id="mobilePanFix">
+@media (max-width: 1024px) {
+  html, body { width:100%; max-width:100%; overflow-x:hidden !important; }
+  body { padding-bottom:0 !important; }
+  .layout-pan {
+    width:100vw;
+    max-width:100vw;
+    overflow-x:auto !important;
+    overflow-y:visible;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior-x:contain;
+    touch-action:pan-x pan-y;
+  }
+  .layout-pan > .app-shell {
+    width:1000px !important;
+    min-width:1000px !important;
+    max-width:none !important;
+    margin:0 !important;
+    overflow:visible !important;
+  }
+}
+@media (max-width: 430px) {
+  .layout-pan > .app-shell {
+    width:950px !important;
+    min-width:950px !important;
+  }
+}
+  </style>\n</head>`);
+    }
+
+    if (!html.includes('class="layout-pan"')) {
+      html = html.replace('<div class="app-shell">', '<div class="layout-pan"><div class="app-shell">');
+      html = html.replace(/<\/div>\s*\n\s*<nav class="mobile-nav">/, '</div></div>\n\n  <nav class="mobile-nav">');
     }
 
     html = html.replace(
@@ -32,7 +68,7 @@ module.exports = async function handler(req, res) {
     }
 
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Cache-Control', 'no-store, max-age=0');
     return res.status(200).send(html);
   } catch (error) {
     console.error(error);
