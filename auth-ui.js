@@ -1,4 +1,15 @@
 (() => {
+  const xhr = new XMLHttpRequest();
+  xhr.open('GET', './demo-mode.js?v=1', false);
+  xhr.send(null);
+  if (xhr.status >= 200 && xhr.status < 300) {
+    (0, eval)(xhr.responseText);
+  } else {
+    throw new Error('Demo mode gagal dimuat');
+  }
+})();
+
+(() => {
   const style = document.createElement('style');
   style.textContent = `
     .auth-hidden{visibility:hidden!important}.auth-screen{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:24px;background:#f4f7fb;font-family:Inter,system-ui,sans-serif}.auth-card{width:min(420px,100%);background:#fff;border:1px solid #e3e9f1;border-radius:22px;padding:28px;box-shadow:0 24px 70px rgba(25,47,83,.12)}.auth-logo{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:#eef3fb;font-size:25px;margin-bottom:18px}.auth-card h1{margin:0 0 8px;font-size:25px;color:#1f2e45}.auth-card p{margin:0 0 22px;color:#75839a;font-size:13px;line-height:1.55}.auth-field{display:flex;flex-direction:column;gap:7px;margin-bottom:14px;font-size:12px;font-weight:700;color:#37475f}.auth-field input{border:1px solid #dbe3ee;border-radius:11px;padding:12px 13px;font:inherit;outline:none;background:#fbfcfe}.auth-field input:focus{border-color:#315e9d;background:#fff}.auth-btn{width:100%;border:0;border-radius:11px;padding:12px 14px;background:#234f8b;color:#fff;font-weight:800;cursor:pointer}.auth-btn:disabled{opacity:.55;cursor:default}.auth-state{min-height:18px;margin-top:12px;font-size:12px;color:#c34752}.auth-setup{background:#fff7e7;border:1px solid #f2d79d;border-radius:12px;padding:12px 14px;color:#77551a;font-size:12px;line-height:1.5}.auth-logout{border:1px solid #dce4ef;background:#fff;border-radius:10px;padding:8px 11px;font-size:12px;font-weight:700;color:#44546b;cursor:pointer}
@@ -50,12 +61,8 @@
       const btn = document.createElement('button');
       btn.id = 'logoutBtn';
       btn.className = 'auth-logout';
-      btn.textContent = username ? `Logout · ${username}` : 'Logout';
-      btn.onclick = async () => {
-        btn.disabled = true;
-        try { await fetch('/api/auth', { method:'DELETE' }); } catch (_) {}
-        location.reload();
-      };
+      btn.textContent = username ? `Demo · ${username}` : 'Demo';
+      btn.title = 'Mode demo aktif — data akan kembali ke awal saat halaman di-refresh';
       actions.insertBefore(btn, actions.firstChild);
     }
   }
