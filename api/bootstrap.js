@@ -17,8 +17,7 @@ module.exports = async function handler(req, res) {
       SELECT t.*, s.name AS service_name
       FROM transactions t
       LEFT JOIN services s ON s.id=t.service_id
-      ORDER BY t.created_at DESC
-      LIMIT 1000`;
+      ORDER BY t.created_at DESC`;
 
     res.setHeader('Cache-Control', 'no-store');
     return res.status(200).json({ machines, services, transactions });
