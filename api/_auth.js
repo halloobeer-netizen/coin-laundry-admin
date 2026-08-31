@@ -55,7 +55,10 @@ function clearSessionCookie(res) {
 }
 
 function requireAuth(req, res) {
-  if (!isConfigured()) return true;
+  if (!isConfigured()) {
+    res.status(503).json({ error: 'Login admin belum dikonfigurasi di Vercel' });
+    return false;
+  }
   const session = verifySession(req);
   if (session.authenticated) return true;
   res.status(401).json({ error: 'Sesi login tidak valid atau sudah berakhir' });
