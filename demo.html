@@ -18,7 +18,9 @@
         if(!response.ok) throw new Error('Gagal mengambil aplikasi');
         let html=await response.text();
         html=html.replace('<title>Clean Wash Admin</title>','<title>DEMO — Clean Wash Coin Laundry Admin</title>');
-        html=html.replace('<script src="./auth-ui.js"></script>','<script src="./demo-mode.js?v=1"></script>\n  <script src="./auth-ui.js"></script>');
+        const authTag='<scr'+'ipt src="./auth-ui.js"></scr'+'ipt>';
+        const demoTag='<scr'+'ipt src="./demo-mode.js?v=1"></scr'+'ipt>';
+        html=html.replace(authTag,demoTag+'\n  '+authTag);
         document.open();
         document.write(html);
         document.close();
